@@ -8,6 +8,7 @@ module MEDIAN #(parameter SIZE = 8, parameter LENGHT = 9) (input logic [SIZE-1:0
 
   localparam I_WIDTH = $clog2(LENGHT);
 
+  logic BYP;
   logic [I_WIDTH-1:0] count, state;
   logic oldDSI;
 
@@ -25,6 +26,7 @@ module MEDIAN #(parameter SIZE = 8, parameter LENGHT = 9) (input logic [SIZE-1:0
     begin
       count = 0;
       state = 0;
+      DSO = 0;
     end
     if(!DSI)
     begin
@@ -35,11 +37,12 @@ module MEDIAN #(parameter SIZE = 8, parameter LENGHT = 9) (input logic [SIZE-1:0
       begin
         count <= 0;
         state <= 0;
+        DSO <= 1;
       end
     end
   end
 
-  assign BYP = (count >= LENGHT - 1 - state);
+  assign BYP = (count >= LENGHT - 1 - state) | DSI;
 
   MED I_MED(.DI(DI), .DSI(DSI), .BYP(BYP), .CLK(CLK), .DO(DO));
 
