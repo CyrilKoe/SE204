@@ -93,7 +93,7 @@ module MED_tb;  // Un environnement de simulation n'a ni entrees ni
       end
     end
     // Lorsque la simulation est terminee on affiche un message.
-    $display("Fin de la simulation sans aucune erreur"); 
+    $display("Fin de la simulation sans aucune erreur");
     $finish; // Et on termine la simulation.
   end
 

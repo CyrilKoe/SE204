@@ -24,16 +24,15 @@ module MEDIAN #(parameter SIZE = 8, parameter LENGHT = 9) (input logic [SIZE-1:0
     oldDSI <= DSI;
     if(oldDSI != DSI)
     begin
-      count = 0;
-      state = 0;
-      DSO = 0;
+      count <= 0;
+      state <= 0;
+      DSO <= 0;
     end
     if(!DSI)
     begin
-      count = count + 1;
-      state <= (count == LENGHT) ? state+1 : state;
-      count <= (count == LENGHT) ? 0 : count;
-      if(state == 4 && count == 4)
+      state <= (count+1 == LENGHT) ? state+1 : state;
+      count <= (count+1 == LENGHT) ? 0 : count+1;
+      if(state == 4 && count == 3)
       begin
         count <= 0;
         state <= 0;
