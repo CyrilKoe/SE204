@@ -14,7 +14,7 @@ SOURCE_FILES =  MCE.sv MED.sv MEDIAN.sv
 
 # Top module for synthesis
 # add the top modle for synthesis ex:MCE
-export TOP_MODULE  = MCE
+export TOP_MODULE  = MEDIAN
 
 export FILES = $(patsubst %,$(SRC_DIR)/%,$(SOURCE_FILES))
 
