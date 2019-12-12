@@ -53,7 +53,8 @@ module wb_bram #(parameter mem_adr_width = 11) (
   always_ff @(posedge wb_s.clk)
   begin
     if (wb_s.we)
-      mem[adr] <= (mem[adr] & ~mask) | (wb_s.dat_ms & mask);
+      for(int i = 1; i<=4; i++)
+        if(wb_s.sel[i-1]) mem[adr][8*i - 1 -: 8] = wb_s.dat_ms[8*i - 1 -: 8];
     wb_s.dat_sm <= mem[adr];
   end
 
