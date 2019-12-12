@@ -1,3 +1,5 @@
-/transcript
-/work
-vsim.wlf
+*
+!*.sv
+!.gitignore
+!bogart_bruite.hex
+!bogart_filtre.pgm

@@ -12,10 +12,10 @@ module wb_bram #(parameter mem_adr_width = 11) (
 
   /* PARTIE GENERATION DU ACK */
 
-  // On crée un registre pour décaler l'ack, puis on multiplexera pour l'utiliser ou non
+  // Compteur pour retarder l'ack
   logic cnt;
 
-  //Gestion des états
+  //Gestion du compteur
   always_ff @(posedge wb_s.clk)
   if(wb_s.rst)
     cnt <= 0;
