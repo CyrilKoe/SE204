@@ -10,33 +10,27 @@ module wb_bram #(parameter mem_adr_width = 11) (
   wshb_if.slave wb_s
   );
 
-  /* PARTIE MACHINE A ETATS */
+  /* PARTIE GENERATION DU ACK */
 
-  enum logic { INIT, RECU } state;
-
+  // On crée un registre pour décaler l'ack, puis on multiplexera pour l'utiliser ou non
+  logic cnt;
 
   //Gestion des états
   always_ff @(posedge wb_s.clk)
-  if (wb_s.rst)
-  state <= INIT ;
+  if(wb_s.rst)
+    cnt <= 0;
   else
-  case (state)
-    INIT: if (wb_s.stb) state <= RECU;
-    RECU: state <= INIT;
-  endcase
+    if(wb_s.stb)
+      cnt <= wb_s.we ? 0 : cnt+1;
 
   //Gestion des signaux de sortie
   always_comb begin
     wb_s.rty = 0;
     wb_s.err = 0;
-    wb_s.ack = 0;
-
-    if(state == INIT)
-    wb_s.ack = wb_s.we;
-    if(state == RECU)
-    begin
-      wb_s.ack = 1;
-    end
+    if(wb_s.stb)
+      wb_s.ack = wb_s.we ? 1 : (cnt == 1);
+    else
+      wb_s.ack = 0;
   end
 
   /* PARTIE GESTION DE LA MEMOIRE */
@@ -48,7 +42,7 @@ module wb_bram #(parameter mem_adr_width = 11) (
   //Redimensionnement addresse
   assign adr = wb_s.adr[mem_adr_width-1:0] >> 2;
 
-  //Application du masque
+  //Creation du masque
   always_comb
   begin
     for(int k = 3; k >= 0 ; k--)
