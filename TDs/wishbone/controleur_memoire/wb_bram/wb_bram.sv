@@ -40,14 +40,8 @@ module wb_bram #(parameter mem_adr_width = 11) (
   logic[31:0] mask;
 
   //Redimensionnement addresse
-  assign adr = wb_s.adr[mem_adr_width-1:0] >> 2;
+  assign adr = wb_s.adr >> 2;
 
-  //Creation du masque
-  always_comb
-  begin
-    for(int k = 3; k >= 0 ; k--)
-      mask = {mask, {8{wb_s.sel[k]}}};
-  end
 
   //Ecriture et lecture mémoire
   always_ff @(posedge wb_s.clk)
