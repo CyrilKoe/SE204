@@ -16,6 +16,8 @@ module wb_bram #(parameter mem_adr_width = 11) (
   // Compteur pour retarder l'ack
   logic counter, burst_enabled, burst_condition;
 
+  // Condition de lancement du burst, bug si le maître envoie un CTI "reserved"
+  // Pas non plus de test du burst lineaire ou non, a priori non demandé
   assign burst_condition = !counter && wb_s.cti[0] ^ wb_s.cti[1];
 
   //Gestion du compteur et du burst
@@ -29,11 +31,12 @@ module wb_bram #(parameter mem_adr_width = 11) (
   begin
     if(wb_s.stb)
     begin
+      // On stoppe l'avancement du conteur si il y a un burst
       counter <= wb_s.we ^ burst_enabled ? 0 : counter+1;
-
-      // En supposant que le maître n'envoie pas de CTI "reserved"
+      // Lancement du burst (que si lecture)
       if(burst_condition)
         burst_enabled <= !wb_s.we;
+      // Si cti = 111 (marche si pas de CTI reserved)
       if(wb_s.cti[2])
         burst_enabled <= 0;
     end
@@ -45,6 +48,7 @@ module wb_bram #(parameter mem_adr_width = 11) (
   always_comb begin
     wb_s.rty = 0;
     wb_s.err = 0;
+    // Si burst on ack directement
     if(wb_s.stb)
       wb_s.ack = wb_s.we ? 1 : (counter == 1) | burst_enabled;
     else
@@ -57,10 +61,10 @@ module wb_bram #(parameter mem_adr_width = 11) (
   logic [mem_adr_width-1:0] adr;
   logic[31:0] mask;
 
-  //Redimensionnement addresse
+  //Redimensionnement addresse, en cas de burst on lit directement la prochaine
   assign adr = (burst_enabled) ? (wb_s.adr >> 2 ) + 1 : wb_s.adr >> 2;
 
-  //Ecriture et lecture mémoire
+  //Ecriture et lecture mémoire, nécessite une mémoire coupée en 4 mais sinon je ne trouve pas comment masquer
   always_ff @(posedge wb_s.clk)
   begin
     if (wb_s.we)
