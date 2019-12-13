@@ -37,7 +37,6 @@ module wb_bram #(parameter mem_adr_width = 11) (
 
   logic[31:0] mem [2**mem_adr_width-1:0];
   logic [mem_adr_width-1:0] adr;
-  logic[31:0] mask;
 
   //Redimensionnement addresse
   assign adr = wb_s.adr >> 2;
