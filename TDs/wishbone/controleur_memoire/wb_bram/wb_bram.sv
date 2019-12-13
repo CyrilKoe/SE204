@@ -70,5 +70,3 @@ module wb_bram #(parameter mem_adr_width = 11) (
   end
 
 endmodule
-
-// TODO : CORRECTION ADDRESSAGE MEMOIRE TAG 1 + REMISE DU CNT A 0
