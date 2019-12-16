@@ -74,6 +74,33 @@ assign wshb_if_sdram.bte = '0 ;
 //------- Code Eleves ------
 //--------------------------
 
+`ifdef SIMULATION
+  localparam MAX_CNT = 5;
+`else
+  localparam MAX_CNT = 5;
+`endif
+
+parameter CNT_WIDTH = $clog2(MAX_CNT);
+
+logic[CNT_WIDTH-1:0] cnt;
+
+
+always @ (posedge sys_clk) begin
+	if(KEY[0])
+	begin
+		cnt = 0;
+		LED[1] <= 0;
+	end
+	else
+	begin
+		cnt <= (cnt==MAX_CNT-1) ? 0 : cnt+1;
+		if(cnt == MAX_CNT-1) LED[1] <= !LED[1];
+	end
+end
+
+assign LED[0] = KEY[0];
+
+
 
 
 endmodule
