@@ -41,7 +41,7 @@ hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
     .hws_ifm  (hws_ifm),
-	.sys_rst  (sys_rst), // output
+	.sys_rst  (), // output
     .SW_0     ( SW[0] ),
     .KEY      ( KEY )
  );
@@ -74,19 +74,24 @@ assign wshb_if_sdram.bte = '0 ;
 //------- Code Eleves ------
 //--------------------------
 
+// Partie de base
+
 `ifdef SIMULATION
-  localparam MAX_CNT = 5;
+  localparam MAX_CNT=50 ;
 `else
-  localparam MAX_CNT = 5;
+  localparam MAX_CNT=50000000 ;
 `endif
 
 parameter CNT_WIDTH = $clog2(MAX_CNT);
 
 logic[CNT_WIDTH-1:0] cnt;
 
+assign sys_rst = KEY[0];
+assign LED[0] = KEY[0];
+
 
 always @ (posedge sys_clk) begin
-	if(KEY[0])
+	if(sys_rst)
 	begin
 		cnt = 0;
 		LED[1] <= 0;
@@ -98,9 +103,21 @@ always @ (posedge sys_clk) begin
 	end
 end
 
-assign LED[0] = KEY[0];
+// Gestion du pxl_rst
 
+wire pixel_rst, pixel_rst_buffer;
 
+always_ff@(posedge pixel_clk OR posedge sys_rst)
+if(sys_rst)
+begin
+	pixel_rst_buffer <= 1;
+	pixel_rst <= 1;
+end
+else
+begin
+	pixel_rst_buffer <= 0;
+	pixel_rst <= pixel_rst_buffer;
+end
 
 
 endmodule
