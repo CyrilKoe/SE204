@@ -77,14 +77,14 @@ assign wshb_if_sdram.bte = '0 ;
 // Partie de base
 
 `ifdef SIMULATION
-  localparam MAX_CNT=50 ;
+  localparam MAX_CNT_1=50 ;
 `else
-  localparam MAX_CNT=50000000 ;
+  localparam MAX_CNT_1=50000000 ;
 `endif
 
-parameter CNT_WIDTH = $clog2(MAX_CNT);
+parameter CNT_WIDTH_1 = $clog2(MAX_CNT_1);
 
-logic[CNT_WIDTH-1:0] cnt;
+logic[CNT_WIDTH_1-1:0] cnt_1;
 
 assign sys_rst = KEY[0];
 assign LED[0] = KEY[0];
@@ -93,13 +93,13 @@ assign LED[0] = KEY[0];
 always @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
-		cnt = 0;
+		cnt_1 = 0;
 		LED[1] <= 0;
 	end
 	else
 	begin
-		cnt <= (cnt==MAX_CNT-1) ? 0 : cnt+1;
-		if(cnt == MAX_CNT-1) LED[1] <= !LED[1];
+		cnt_1 <= (cnt_1==MAX_CNT_1-1) ? 0 : cnt_1+1;
+		if(cnt_1 == MAX_CNT_1-1) LED[1] <= !LED[1];
 	end
 end
 
@@ -119,5 +119,33 @@ begin
 	pixel_rst <= pixel_rst_buffer;
 end
 
+// Nouveau compteur
+
+`ifdef SIMULATION
+  localparam MAX_CNT_2=16 ;
+`else
+  localparam MAX_CNT_2=16000000 ;
+`endif
+
+parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
+
+logic[CNT_WIDTH_2-1:0] cnt_2;
+
+assign sys_rst = KEY[0];
+assign LED[0] = KEY[0];
+
+
+always @ (posedge sys_clk) begin
+	if(sys_rst)
+	begin
+		cnt_2 = 0;
+		LED[1] <= 0;
+	end
+	else
+	begin
+		cnt_2 <= (cnt==MAX_CNT_2-1) ? 0 : cnt+1;
+		if(cnt_2 == MAX_CNT_2-1) LED[1] <= !LED[1];
+	end
+end
 
 endmodule
