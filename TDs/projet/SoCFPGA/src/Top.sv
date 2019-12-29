@@ -90,7 +90,7 @@ assign sys_rst = KEY[0];
 assign LED[0] = KEY[0];
 
 
-always @ (posedge sys_clk) begin
+always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
 		cnt_1 = 0;
@@ -107,7 +107,7 @@ end
 
 wire pixel_rst, pixel_rst_buffer;
 
-always_ff@(posedge pixel_clk OR posedge sys_rst)
+always_ff@(posedge pixel_clk or posedge sys_rst)
 if(sys_rst)
 begin
 	pixel_rst_buffer <= 1;
@@ -135,7 +135,7 @@ assign sys_rst = KEY[0];
 assign LED[0] = KEY[0];
 
 
-always @ (posedge sys_clk) begin
+always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
 		cnt_2 = 0;
@@ -143,7 +143,7 @@ always @ (posedge sys_clk) begin
 	end
 	else
 	begin
-		cnt_2 <= (cnt==MAX_CNT_2-1) ? 0 : cnt+1;
+		cnt_2 <= (cnt==MAX_CNT_2-1) ? 0 : cnt_2+1;
 		if(cnt_2 == MAX_CNT_2-1) LED[1] <= !LED[1];
 	end
 end
