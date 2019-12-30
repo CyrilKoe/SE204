@@ -90,7 +90,7 @@ assign sys_rst = KEY[0];
 assign LED[0] = KEY[0];
 
 
-always @ (posedge sys_clk) begin
+always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
 		cnt_1 = 0;
@@ -105,9 +105,10 @@ end
 
 // Gestion du pxl_rst
 
-wire pixel_rst, pixel_rst_buffer;
+logic pixel_rst;
+logic pixel_rst_buffer;
 
-always_ff@(posedge pixel_clk OR posedge sys_rst)
+always_ff@(posedge pixel_clk or posedge sys_rst)
 if(sys_rst)
 begin
 	pixel_rst_buffer <= 1;
@@ -132,19 +133,17 @@ parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
 assign sys_rst = KEY[0];
-assign LED[0] = KEY[0];
 
-
-always @ (posedge sys_clk) begin
-	if(sys_rst)
+always_ff @ (posedge pixel_clk) begin
+	if(pixel_rst)
 	begin
 		cnt_2 = 0;
-		LED[1] <= 0;
+		LED[2] <= 0;
 	end
 	else
 	begin
-		cnt_2 <= (cnt==MAX_CNT_2-1) ? 0 : cnt+1;
-		if(cnt_2 == MAX_CNT_2-1) LED[1] <= !LED[1];
+		cnt_2 <= (cnt_2==MAX_CNT_2-1) ? 0 : cnt_2+1;
+		if(cnt_2 == MAX_CNT_2-1) LED[2] <= !LED[2];
 	end
 end
 
