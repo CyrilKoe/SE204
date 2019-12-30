@@ -34,9 +34,6 @@ sys_pll  sys_pll_inst(
 wshb_if #( .DATA_BYTES(4)) wshb_if_sdram  (sys_clk, sys_rst);
 wshb_if #( .DATA_BYTES(4)) wshb_if_stream (sys_clk, sys_rst);
 
-// Pour pouvoir simuler sur PC personel
-// on enlève le support matériel
-`ifdef SIMULATION
 //=============================
 //  Le support matériel
 //=============================
@@ -44,11 +41,10 @@ hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
     .hws_ifm  (hws_ifm),
-		.sys_rst  (), // output
-    .SW_0     (SW[0]),
-    .KEY      (KEY)
+	.sys_rst  (), // output
+    .SW_0     ( SW[0] ),
+    .KEY      ( KEY )
  );
-`endif
 
 //=============================
 // On neutralise l'interface
