@@ -136,7 +136,7 @@ parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
-assign sys_rst = KEY[0];
+assign sys_rst = !KEY[0];
 
 always_ff @ (posedge pixel_clk) begin
 	if(pixel_rst)
