@@ -34,17 +34,7 @@ sys_pll  sys_pll_inst(
 wshb_if #( .DATA_BYTES(4)) wshb_if_sdram  (sys_clk, sys_rst);
 wshb_if #( .DATA_BYTES(4)) wshb_if_stream (sys_clk, sys_rst);
 
-//=============================
-//  Le support matériel
-//=============================
-hw_support hw_support_inst (
-    .wshb_ifs (wshb_if_sdram),
-    .wshb_ifm (wshb_if_stream),
-    .hws_ifm  (hws_ifm),
-	.sys_rst  (), // output
-    .SW_0     ( SW[0] ),
-    .KEY      ( KEY )
- );
+
 
 //=============================
 // On neutralise l'interface
@@ -105,7 +95,8 @@ end
 
 // Gestion du pxl_rst
 
-wire pixel_rst, pixel_rst_buffer;
+logic pixel_rst;
+logic pixel_rst_buffer;
 
 always_ff@(posedge pixel_clk or posedge sys_rst)
 if(sys_rst)
@@ -132,19 +123,17 @@ parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
 assign sys_rst = KEY[0];
-assign LED[0] = KEY[0];
 
-
-always_ff @ (posedge sys_clk) begin
-	if(sys_rst)
+always_ff @ (posedge pixel_clk) begin
+	if(pixel_rst)
 	begin
 		cnt_2 = 0;
-		LED[1] <= 0;
+		LED[2] <= 0;
 	end
 	else
 	begin
-		cnt_2 <= (cnt==MAX_CNT_2-1) ? 0 : cnt_2+1;
-		if(cnt_2 == MAX_CNT_2-1) LED[1] <= !LED[1];
+		cnt_2 <= (cnt_2==MAX_CNT_2-1) ? 0 : cnt_2+1;
+		if(cnt_2 == MAX_CNT_2-1) LED[2] <= !LED[2];
 	end
 end
 
