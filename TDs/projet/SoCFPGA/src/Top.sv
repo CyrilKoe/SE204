@@ -74,7 +74,7 @@ assign wshb_if_sdram.bte = '0 ;
 //------- Code Eleves ------
 //--------------------------
 
-// Partie de base
+/** SQUELETTE DU PROJET **/
 
 `ifdef SIMULATION
   localparam MAX_CNT_1=50 ;
@@ -146,5 +146,15 @@ always_ff @ (posedge pixel_clk) begin
 		if(cnt_2 == MAX_CNT_2-1) LED[2] <= !LED[2];
 	end
 end
+
+/** CONTROLLEUR VIDEO **/
+
+video_if video_if();
+
+vga vga_controller(
+	.pixel_clk(pixel_clk),
+	.pixel_rst(pixel_rst),
+	.video_ifm(video_if.master)
+);
 
 endmodule
