@@ -1,8 +1,19 @@
 module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	input wire pixel_clk,
 	input wire pixel_rst,
-	video_if.master video_ifm
+	video_if.master video_ifm,
+	wshb_if.master  wshb_ifm
 );
+
+/** ASSIGNATION DES SIGNAUX MAITRES **/
+assign wshb_ifm.dat_ms = 32'hBABECAFE;
+assign wshb_ifm.adr = '0;
+assign wshb_ifm.cyc = 1'b1;
+assign wshb_ifm.sel = 4'b1111;
+assign wshb_ifm.stb = 1'b1;
+assign wshb_ifm.we = 1'b1;
+assign wshb_ifm.cti = '0;
+assign wshb_ifm.bte = '0;
 
 /** GENERATION DES SIGNAUX **/
 
