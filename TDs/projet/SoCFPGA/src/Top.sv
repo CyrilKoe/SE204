@@ -82,7 +82,7 @@ assign wshb_if_sdram.bte = '0 ;
   localparam MAX_CNT_1=50000000 ;
 `endif
 
-parameter CNT_WIDTH_1 = $clog2(MAX_CNT_1);
+localparam CNT_WIDTH_1 = $clog2(MAX_CNT_1);
 
 logic[CNT_WIDTH_1-1:0] cnt_1;
 
@@ -128,7 +128,7 @@ end
   localparam MAX_CNT_2=16000000 ;
 `endif
 
-parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
+localparam CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
