@@ -9,7 +9,7 @@
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
 
-# RECUPERATION OU INVALIDATION EVENTUELLE DES ENTREES SORTIES DE PROGRAMMATION DU FPGA POUR  L'APPLICATION 
+# RECUPERATION OU INVALIDATION EVENTUELLE DES ENTREES SORTIES DE PROGRAMMATION DU FPGA POUR  L'APPLICATION
 # (entrées/sorties à double usage...)
 set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "AS OUTPUT DRIVING AN UNSPECIFIED SIGNAL"
 
@@ -30,7 +30,7 @@ set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "AS OUTPUT DRIVING 
 #     set_location_assignment PIN_M20 -to address[10] -comment "Address pin to Second FPGA"
 #
 
-#source ./scripts/pins_assignment_vga.tcl
+source ./scripts/pins_assignment_vga.tcl
 
 ###################################################
 ### PLACEZ ICI VOS DEFINITIONS
