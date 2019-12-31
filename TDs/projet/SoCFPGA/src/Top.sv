@@ -157,7 +157,7 @@ vga #( .HDISP(HDISP), .VDISP(VDISP)) vga_controller (
 	.pixel_clk(pixel_clk),
 	.pixel_rst(pixel_rst),
 	.video_ifm(video_ifm),
-	.wshb_if_sdram(wshb_ifm)
+	.wshb_ifm(wshb_if_sdram)
 );
 
 endmodule
