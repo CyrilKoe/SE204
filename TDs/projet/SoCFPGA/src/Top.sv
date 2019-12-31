@@ -89,8 +89,8 @@ localparam CNT_WIDTH_1 = $clog2(MAX_CNT_1);
 
 logic[CNT_WIDTH_1-1:0] cnt_1;
 
-assign sys_rst = KEY[0];
-assign LED[0] = KEY[0];
+assign sys_rst = !KEY[0];
+assign LED[0] = sys_rst;
 
 
 always_ff @ (posedge sys_clk) begin
