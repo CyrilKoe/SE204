@@ -36,12 +36,10 @@ initial begin: ENTREES
   KEY[0] = 1;
   #128ns
   KEY[0] = 0;
-  #128ns
-  KEY[0] = 1;
 end
 
 initial begin: TIMER
-  #300ns
+  #0.1s;
   $stop();
 end
 

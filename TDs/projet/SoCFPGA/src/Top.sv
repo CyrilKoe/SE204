@@ -38,6 +38,7 @@ wshb_if #( .DATA_BYTES(4)) wshb_if_stream (sys_clk, sys_rst);
 //=============================
 //  Le support matériel
 //=============================
+`ifndef SIMULATION
 hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
@@ -46,6 +47,7 @@ hw_support hw_support_inst (
     .SW_0     ( SW[0] ),
     .KEY      ( KEY )
  );
+`endif
 
 //=============================
 // On neutralise l'interface
@@ -133,7 +135,6 @@ localparam CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
-assign sys_rst = !KEY[0];
 
 always_ff @ (posedge pixel_clk) begin
 	if(pixel_rst)

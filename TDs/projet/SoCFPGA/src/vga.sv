@@ -49,15 +49,15 @@ assign video_ifm.BLANK = (h_cnt >= HFP+HPULSE+HBP) && (v_cnt >= VFP+VPULSE+VBP);
 
 /** GENERATION DE LA MIRE **/
 
-localparam XCNT_WIDTH = $clog2(HDISP_SIZE);
-localparam YCNT_WIDTH = $clog2(VDISP_SIZE);
+localparam XCNT_WIDTH = $clog2(HDISP);
+localparam YCNT_WIDTH = $clog2(VDISP);
 logic[XCNT_WIDTH-1:0] x_cnt;
 logic[YCNT_WIDTH-1:0] y_cnt;
 
 // Gestion des nouveaux compteurs
 always_comb
 begin
-	if(video_ifm.BLANK)
+	if(!video_ifm.BLANK)
 	begin
 		x_cnt = 0;
 		y_cnt = 0;
