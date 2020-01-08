@@ -7,8 +7,8 @@ module Top  #(parameter HDISP = 800, parameter VDISP = 480)(
 	output logic [7:0]	LED,
 	input  wire	 [3:0]	SW,
     // Les signaux du support matériel son regroupés dans une interface
-    hws_if.master       hws_ifm,
-		video_if.master     video_ifm
+        hws_if.master       hws_ifm,
+	video_if.master     video_ifm
 );
 
 //====================================
@@ -38,7 +38,7 @@ wshb_if #( .DATA_BYTES(4)) wshb_if_stream (sys_clk, sys_rst);
 //=============================
 //  Le support matériel
 //=============================
-`ifndef SIMULATION
+`ifndef SIMULATIONHOME
 hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
@@ -98,7 +98,7 @@ assign LED[0] = sys_rst;
 always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
-		cnt_1 = 0;
+		cnt_1 <= 0;
 		LED[1] <= 0;
 	end
 	else
@@ -141,7 +141,7 @@ logic[CNT_WIDTH_2-1:0] cnt_2;
 always_ff @ (posedge pixel_clk) begin
 	if(pixel_rst)
 	begin
-		cnt_2 = 0;
+		cnt_2 <= 0;
 		LED[2] <= 0;
 	end
 	else

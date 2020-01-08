@@ -5,7 +5,9 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	wshb_if.master  wshb_ifm
 );
 
+
 /** ASSIGNATION DES SIGNAUX MAITRES **/
+/*
 assign wshb_ifm.dat_ms = 32'hBABECAFE;
 assign wshb_ifm.adr = '0;
 assign wshb_ifm.cyc = 1'b1;
@@ -14,6 +16,8 @@ assign wshb_ifm.stb = 1'b1;
 assign wshb_ifm.we = 1'b1;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
+*/
+
 
 /** GENERATION DES SIGNAUX **/
 
@@ -81,6 +85,44 @@ begin
 end
 
 // Génération de la grille
-assign video_ifm.RGB = (h_cnt[3:0] == 0) || (v_cnt[3:0] == 0) ? 255 : 0;
+assign video_ifm.RGB = (x_cnt[3:0] == 0) || (y_cnt[3:0] == 0) ? 255 : 0;
+
+logic [31:0] word;
+logic[XCNT_WIDTH-1:0] x_cnt_sdram;
+logic[YCNT_WIDTH-1:0] y_cnt_sdram;
+//** LECTURE EN SDRAM **//
+always_ff @ (posedge wshb_ifm.clk)
+if(wshb_ifm.rst)
+begin
+	word <= 0;
+	x_cnt_sdram <= 0;
+	y_cnt_sdram <= 0;
+end
+else
+begin
+	if(wshb_ifm.ack)
+	begin
+		word <= wshb_ifm.dat_sm;
+
+		// Mise à jour des compteurs
+		x_cnt_sdram <= x_cnt_sdram+1;
+		if(x_cnt_sdram == HDISP-1)
+		begin
+			x_cnt_sdram <= 0;
+			y_cnt_sdram <= y_cnt_sdram+1;
+		end
+
+		if(y_cnt_sdram == VDISP-1)
+			y_cnt_sdram <= 0;
+	end
+end
+
+assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
+assign wshb_ifm.we = 0'b0;
+assign wshb_ifm.cyc = 1'b1;
+assign wshb_ifm.sel = 4'b1111;
+assign wshb_ifm.stb = 1'b1;
+assign wshb_ifm.cti = '0;
+assign wshb_ifm.bte = '0;
 
 endmodule
