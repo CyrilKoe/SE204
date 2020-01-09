@@ -35,11 +35,10 @@ begin
 	if(h_cnt == HCNT_SIZE-1)
 	begin
 		h_cnt <= 0;
-		v_cnt <= v_cnt+1;
+		v_cnt <= (v_cnt == VCNT_SIZE-1) ? 0 : v_cnt+1;
 	end
 
-	if(v_cnt == VCNT_SIZE-1)
-		v_cnt <= 0;
+
 end
 
 // Génération des signaux videos
@@ -70,6 +69,8 @@ begin
 end
 
 // Génération de la grille
-assign video_ifm.RGB = (h_cnt[3:0] == 0) || (v_cnt[3:0] == 0) ? 255 : 0;
+always_comb begin
+	video_ifm.RGB = (x_cnt[3:0] == 0) || (y_cnt[3:0] == 0) ? {3{8'b11111111}} : 0;
+end
 
 endmodule

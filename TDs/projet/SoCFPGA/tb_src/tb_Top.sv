@@ -26,6 +26,9 @@ Top #( .HDISP(160), .VDISP(90)) Top0(
   .video_ifm(video_if0.master)
 );
 
+screen #(.mode(13),.X(160),.Y(90)) screen0(.video_ifs(video_if0))  ;
+
+
 ///////////////////////////////
 //  Code élèves
 //////////////////////////////
@@ -39,7 +42,7 @@ initial begin: ENTREES
 end
 
 initial begin: TIMER
-  #0.1s;
+  #100s;
   $stop();
 end
 
