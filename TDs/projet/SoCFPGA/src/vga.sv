@@ -8,7 +8,7 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 //* INSTANCIATION FIFO *//
 
 logic fifo_read, fifo_write, fifo_rempty,fifo_walmost_full, fifo_wfull;
-logic [7:0] fifo_rdata, fifo_wdata;
+logic [31:0] fifo_rdata, fifo_wdata;
 
 async_fifo #( .DATA_WIDTH(32), .DEPTH_WIDTH(8) ) sdram_video_fifo (
 			.rst(wshb_ifm.rst),
@@ -93,7 +93,7 @@ end
 assign video_ifm.RGB = (x_cnt[3:0] == 0) || (y_cnt[3:0] == 0) ? 255 : 0;
 
 
-//** LECTURE EN SDRAM **//
+//** LECTURE EN SDRAM ET ECRITURE EN FIFO **//
 
 logic [31:0] word;
 logic[XCNT_WIDTH-1:0] x_cnt_sdram;
@@ -109,8 +109,6 @@ else
 begin
 	if(wshb_ifm.ack)
 	begin
-		word <= wshb_ifm.dat_sm;
-
 		// Mise à jour des compteurs
 		x_cnt_sdram <= x_cnt_sdram+1;
 		if(x_cnt_sdram == HDISP-1)
@@ -129,9 +127,17 @@ assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 0'b0;
 assign wshb_ifm.cyc = 1'b1;
 assign wshb_ifm.sel = 4'b1111;
-assign wshb_ifm.stb = 1'b1;
+assign wshb_ifm.stb = !fifo_walmost_full & !wshb_ifm.rst;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
+
+// Ecriture FIFO
+assign fifo_write = wshb_ifm.ack;
+assign fifo_wdata = wshb_ifm.dat_sm;
+
+/** LECTURE EN FIFO **/
+assign fifo_read = 1'b0;
+
 
 
 
