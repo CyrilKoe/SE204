@@ -67,7 +67,7 @@ assign video_ifm.HS = !(h_cnt >= HFP && h_cnt < HFP+HPULSE);
 assign video_ifm.VS = !(v_cnt >= VFP && v_cnt < VFP+VPULSE);
 assign video_ifm.BLANK = (h_cnt >= HFP+HPULSE+HBP) && (v_cnt >= VFP+VPULSE+VBP);
 
-/** GENERATION DE LA MIRE **/
+/** TRADUCTION DES COMPTEURS **/
 
 localparam XCNT_WIDTH = $clog2(HDISP);
 localparam YCNT_WIDTH = $clog2(VDISP);
@@ -88,9 +88,6 @@ begin
 		y_cnt = v_cnt-(VFP+VPULSE+VBP);
 	end
 end
-
-// Génération de la grille
-assign video_ifm.RGB = (x_cnt[3:0] == 0) || (y_cnt[3:0] == 0) ? 255 : 0;
 
 
 //** LECTURE EN SDRAM ET ECRITURE EN FIFO **//
@@ -124,7 +121,7 @@ end
 
 // Génération des signaux
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
-assign wshb_ifm.we = 0'b0;
+assign wshb_ifm.we = 1'b0;
 assign wshb_ifm.cyc = 1'b1;
 assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.stb = !fifo_walmost_full & !wshb_ifm.rst;
@@ -135,9 +132,38 @@ assign wshb_ifm.bte = '0;
 assign fifo_write = wshb_ifm.ack;
 assign fifo_wdata = wshb_ifm.dat_sm;
 
-/** LECTURE EN FIFO **/
-assign fifo_read = 1'b0;
 
+
+/** LECTURE EN FIFO **/
+
+
+// Adaptation du signal first full dans le bon système d'horloge
+logic first_full, pre_first_full, video_began;
+
+always_ff @ (video_ifm.CLK)
+begin
+	if(pixel_rst)
+	begin
+		first_full <= 1'b0;
+		pre_first_full <= 1'b0;
+		video_began <= 1'b0;
+	end
+	else
+		// On attends que la fifo soit full
+		if(!first_full)
+		begin
+			pre_first_full <= fifo_wfull;
+			first_full <= pre_first_full;
+		end
+
+	// Puis, dès qu'on est entre 2 frames, on commence
+		else
+			if((x_cnt <= 0) && (y_cnt <= 0))
+				video_began <= 1'b1;
+end
+
+assign fifo_read = video_ifm.BLANK & video_began;
+assign video_ifm.RGB = fifo_rdata;
 
 
 
