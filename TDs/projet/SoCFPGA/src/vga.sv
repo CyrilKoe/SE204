@@ -55,17 +55,17 @@ begin
 	if(h_cnt == HCNT_SIZE-1)
 	begin
 		h_cnt <= 0;
-		v_cnt <= v_cnt+1;
+		v_cnt <= (v_cnt == VCNT_SIZE-1) ? 0 : v_cnt+1;
 	end
 
-	if(v_cnt == VCNT_SIZE-1)
-		v_cnt <= 0;
+
 end
 
 // Génération des signaux videos
 assign video_ifm.HS = !(h_cnt >= HFP && h_cnt < HFP+HPULSE);
 assign video_ifm.VS = !(v_cnt >= VFP && v_cnt < VFP+VPULSE);
 assign video_ifm.BLANK = (h_cnt >= HFP+HPULSE+HBP) && (v_cnt >= VFP+VPULSE+VBP);
+
 
 /** TRADUCTION DES COMPTEURS **/
 
