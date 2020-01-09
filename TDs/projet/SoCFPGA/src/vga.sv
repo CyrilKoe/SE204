@@ -5,18 +5,23 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	wshb_if.master  wshb_ifm
 );
 
+//* INSTANCIATION FIFO *//
 
-/** ASSIGNATION DES SIGNAUX MAITRES **/
-/*
-assign wshb_ifm.dat_ms = 32'hBABECAFE;
-assign wshb_ifm.adr = '0;
-assign wshb_ifm.cyc = 1'b1;
-assign wshb_ifm.sel = 4'b1111;
-assign wshb_ifm.stb = 1'b1;
-assign wshb_ifm.we = 1'b1;
-assign wshb_ifm.cti = '0;
-assign wshb_ifm.bte = '0;
-*/
+logic fifo_read, fifo_write, fifo_rempty,fifo_walmost_full, fifo_wfull;
+logic [7:0] fifo_rdata, fifo_wdata;
+
+async_fifo #( .DATA_WIDTH(32), .DEPTH_WIDTH(8) ) sdram_video_fifo (
+			.rst(wshb_ifm.rst),
+			.rclk(video_ifm.CLK),
+			.read(fifo_read),
+			.rdata(fifo_rdata),
+			.rempty(fifo_rempty),
+			.wclk(wshb_ifm.clk),
+			.wdata(fifo_wdata),
+			.write(fifo_write),
+			.wfull(fifo_wfull),
+			.walmost_full(fifo_walmost_full)
+);
 
 
 /** GENERATION DES SIGNAUX **/
@@ -87,10 +92,12 @@ end
 // Génération de la grille
 assign video_ifm.RGB = (x_cnt[3:0] == 0) || (y_cnt[3:0] == 0) ? 255 : 0;
 
+
+//** LECTURE EN SDRAM **//
+
 logic [31:0] word;
 logic[XCNT_WIDTH-1:0] x_cnt_sdram;
 logic[YCNT_WIDTH-1:0] y_cnt_sdram;
-//** LECTURE EN SDRAM **//
 always_ff @ (posedge wshb_ifm.clk)
 if(wshb_ifm.rst)
 begin
@@ -117,6 +124,7 @@ begin
 	end
 end
 
+// Génération des signaux
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 0'b0;
 assign wshb_ifm.cyc = 1'b1;
@@ -124,5 +132,7 @@ assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.stb = 1'b1;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
+
+
 
 endmodule

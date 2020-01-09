@@ -43,7 +43,7 @@ hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
     .hws_ifm  (hws_ifm),
-	.sys_rst  (), // output
+		.sys_rst  (), // output
     .SW_0     ( SW[0] ),
     .KEY      ( KEY )
  );
