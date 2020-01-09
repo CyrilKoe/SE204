@@ -17,7 +17,7 @@ hws_if      hws_ifm();
 video_if    video_if0();
 
 // Instance du module Top
-Top #( .HDISP(160), .VDISP(90)) Top0(
+Top #( .HDISP(800), .VDISP(480)) Top0(
   .FPGA_CLK1_50(FPGA_CLK1_50),
   .KEY(KEY),
   .LED(LED),
@@ -26,6 +26,8 @@ Top #( .HDISP(160), .VDISP(90)) Top0(
   .video_ifm(video_if0.master)
 );
 
+ screen #(.mode(13),.X(800),.Y(480)) screen0(.video_ifs(video_if0));
+
 ///////////////////////////////
 //  Code élèves
 //////////////////////////////
@@ -33,13 +35,15 @@ Top #( .HDISP(160), .VDISP(90)) Top0(
 always #10ns FPGA_CLK1_50 = ~FPGA_CLK1_50; // On genere une horloge
 
 initial begin: ENTREES
+  $dumpfile("../signals.vcd");
+  $dumpvars(0,Top0.video_ifm, Top0.wshb_if_sdram, Top0.hw_support_inst);
   KEY[0] = 0;
   #128ns
   KEY[0] = 1;
 end
 
 initial begin: TIMER
-  #0.1s;
+  #10000ns;
   $stop();
 end
 

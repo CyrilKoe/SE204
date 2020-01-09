@@ -165,6 +165,4 @@ end
 assign fifo_read = video_ifm.BLANK & video_began;
 assign video_ifm.RGB = fifo_rdata;
 
-
-
 endmodule
