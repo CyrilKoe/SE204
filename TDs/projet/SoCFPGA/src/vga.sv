@@ -3,7 +3,7 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	input wire pixel_rst,
 	video_if.master video_ifm,
 	wshb_if.master  wshb_ifm
-);
+); 
 
 //* INSTANCIATION FIFO *//
 
