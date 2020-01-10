@@ -91,13 +91,11 @@ end
 
 //** LECTURE EN SDRAM ET ECRITURE EN FIFO **//
 
-logic [31:0] word;
 logic[XCNT_WIDTH-1:0] x_cnt_sdram;
 logic[YCNT_WIDTH-1:0] y_cnt_sdram;
 always_ff @ (posedge wshb_ifm.clk)
 if(wshb_ifm.rst)
 begin
-	word <= 0;
 	x_cnt_sdram <= 0;
 	y_cnt_sdram <= 0;
 end
@@ -135,28 +133,21 @@ assign fifo_wdata = wshb_ifm.dat_sm;
 
 
 // Adaptation du signal first full dans le bon système d'horloge
-logic first_full, pre_first_full, video_began;
+logic pre_first_full, video_began;
 
 always_ff @ (video_ifm.CLK)
+if(pixel_rst)
 begin
-	if(pixel_rst)
-	begin
-		first_full <= 1'b0;
-		pre_first_full <= 1'b0;
-		video_began <= 1'b0;
-	end
-	else
-		// On attends que la fifo soit full
-		if(!first_full)
-		begin
-			pre_first_full <= fifo_wfull;
-			first_full <= pre_first_full;
-		end
+	pre_first_full <= 1'b0;
+	video_began <= 1'b0;
+end
+else
+begin
+	// On attends que la fifo soit full
+	pre_first_full <= fifo_wfull;
 
 	// Puis, dès qu'on est entre 2 frames, on commence
-		else
-			if((x_cnt <= 0) && (y_cnt <= 0))
-				video_began <= 1'b1;
+	video_began <= (x_cnt <= 0) && (y_cnt <= 0) ? pre_first_full : video_began;
 end
 
 assign fifo_read = video_ifm.BLANK & video_began;
