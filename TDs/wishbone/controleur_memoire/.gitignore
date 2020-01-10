@@ -1,2 +1,4 @@
 *.swp
 work
+precision.log
+wb_ram/precision.log

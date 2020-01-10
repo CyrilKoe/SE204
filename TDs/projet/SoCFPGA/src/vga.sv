@@ -58,7 +58,6 @@ begin
 		v_cnt <= (v_cnt == VCNT_SIZE-1) ? 0 : v_cnt+1;
 	end
 
-
 end
 
 // Génération des signaux videos
@@ -111,11 +110,9 @@ begin
 		if(x_cnt_sdram == HDISP-1)
 		begin
 			x_cnt_sdram <= 0;
-			y_cnt_sdram <= y_cnt_sdram+1;
+			y_cnt_sdram <= (y_cnt_sdram == VDISP-1) ? 0 : y_cnt_sdram+1;
 		end
 
-		if(y_cnt_sdram == VDISP-1)
-			y_cnt_sdram <= 0;
 	end
 end
 
