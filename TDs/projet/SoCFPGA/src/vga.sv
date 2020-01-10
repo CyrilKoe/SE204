@@ -3,7 +3,7 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	input wire pixel_rst,
 	video_if.master video_ifm,
 	wshb_if.master  wshb_ifm
-); 
+);
 
 //* INSTANCIATION FIFO *//
 
@@ -117,11 +117,13 @@ end
 // Génération des signaux
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 1'b0;
-assign wshb_ifm.cyc = 1'b1;
+assign wshb_ifm.cyc = wshb_ifm.stb;
 assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.stb = !fifo_walmost_full & !wshb_ifm.rst;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
+assign wshb_ifm.dat_ms = '0;
+
 
 // Ecriture FIFO
 assign fifo_write = wshb_ifm.ack;

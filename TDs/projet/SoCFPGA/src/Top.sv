@@ -7,7 +7,7 @@ module Top  #(parameter HDISP = 800, parameter VDISP = 480)(
 	output logic [7:0]	LED,
 	input  wire	 [3:0]	SW,
     // Les signaux du support matériel son regroupés dans une interface
-        hws_if.master       hws_ifm,
+  hws_if.master       hws_ifm,
 	video_if.master     video_ifm
 );
 
@@ -34,6 +34,9 @@ sys_pll  sys_pll_inst(
 //=============================
 wshb_if #( .DATA_BYTES(4)) wshb_if_sdram  (sys_clk, sys_rst);
 wshb_if #( .DATA_BYTES(4)) wshb_if_stream (sys_clk, sys_rst);
+wshb_if #( .DATA_BYTES(4)) wshb_if_vga  (sys_clk, sys_rst);
+wshb_if #( .DATA_BYTES(4)) wshb_if_mire  (sys_clk, sys_rst);
+
 
 //=============================
 //  Le support matériel
@@ -59,21 +62,6 @@ assign wshb_if_stream.dat_sm = '0 ;
 assign wshb_if_stream.err =  1'b0 ;
 assign wshb_if_stream.rty =  1'b0 ;
 
-/*
-//=============================
-// On neutralise l'interface SDRAM
-// pour l'instant
-// A SUPPRIMER PLUS TARD
-//=============================
-assign wshb_if_sdram.stb  = 1'b0;
-assign wshb_if_sdram.cyc  = 1'b0;
-assign wshb_if_sdram.we   = 1'b0;
-assign wshb_if_sdram.adr  = '0  ;
-assign wshb_if_sdram.dat_ms = '0 ;
-assign wshb_if_sdram.sel = '0 ;
-assign wshb_if_sdram.cti = '0 ;
-assign wshb_if_sdram.bte = '0 ;
-*/
 
 //--------------------------
 //------- Code Eleves ------
@@ -151,13 +139,23 @@ always_ff @ (posedge pixel_clk) begin
 	end
 end
 
-/** CONTROLLEUR VIDEO **/
+/** INSTANCIATIONS **/
 
 vga #( .HDISP(HDISP), .VDISP(VDISP)) vga_controller (
 	.pixel_clk(pixel_clk),
 	.pixel_rst(pixel_rst),
 	.video_ifm(video_ifm),
-	.wshb_ifm(wshb_if_sdram)
+	.wshb_ifm(wshb_if_vga)
+);
+
+mire #( .HDISP(HDISP), .VDISP(VDISP)) mire (
+	.wshb_ifm(wshb_if_mire)
+);
+
+wshb_intercon #( .HDISP(HDISP), .VDISP(VDISP)) wshb_intercon (
+	.wshb_ifs_vga(wshb_if_vga.slave),
+	.wshb_ifs_mire(wshb_if_mire.slave),
+	.wshb_ifm_sdram(wshb_if_sdram.master)
 );
 
 endmodule
