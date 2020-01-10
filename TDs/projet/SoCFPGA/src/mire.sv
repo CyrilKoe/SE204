@@ -37,6 +37,6 @@ assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.stb = (breaker != 0);
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
-assign wshb_ifm.dat_ms = ((x_cnt[3:0] == 0) || (y_cnt[3:0] == 0)) ? {3{8'hff}} : 0;
+assign wshb_ifm.dat_ms = ((x_cnt[3:0] == 0) || (y_cnt[3:0] == 0)) ? {8'(x_cnt+y_cnt),(7'(x_cnt+y_cnt))<<1,~(8'(x_cnt+y_cnt))} : 0;
 
 endmodule
