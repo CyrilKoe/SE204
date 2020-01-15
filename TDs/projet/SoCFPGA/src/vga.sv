@@ -76,7 +76,7 @@ logic[YCNT_WIDTH-1:0] y_cnt;
 // Gestion des nouveaux compteurs
 always_comb
 begin
-	if(!video_ifm.BLANK)
+	if(!video_ifm.BLANK || pixel_rst)
 	begin
 		x_cnt = 0;
 		y_cnt = 0;
@@ -144,13 +144,14 @@ begin
 	video_began <= 1'b0;
 end
 else
-begin
-	// On attends que la fifo soit full
-	pre_first_full <= fifo_wfull;
+	if((x_cnt == 0) && (y_cnt == 0))
+	begin
+		// On attends que la fifo soit full
+		pre_first_full <= fifo_wfull;
 
-	// Puis, dès qu'on est entre 2 frames, on commence
-	video_began <= (x_cnt <= 0) && (y_cnt <= 0) ? pre_first_full : video_began;
-end
+		// Puis, dès qu'on est entre 2 frames, on commence
+		video_began <= pre_first_full;
+	end
 
 assign fifo_read = video_ifm.BLANK & video_began;
 assign video_ifm.RGB = fifo_rdata;

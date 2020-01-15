@@ -7,6 +7,7 @@ localparam YCNT_WIDTH = $clog2(VDISP);
 logic[XCNT_WIDTH-1:0] x_cnt;
 logic[YCNT_WIDTH-1:0] y_cnt;
 logic[5:0] breaker;
+logic[5:0] img;
 
 always_ff @ (posedge wshb_ifm.clk)
 if(wshb_ifm.rst)
@@ -14,6 +15,7 @@ begin
 	x_cnt <= 0;
 	y_cnt <= 0;
   breaker <= 0;
+	img <= 0;
 end
 else
 begin
@@ -37,6 +39,6 @@ assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.stb = (breaker != 0);
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
-assign wshb_ifm.dat_ms = ((x_cnt[5:0] == 0) || (y_cnt[5:0] == 0)) ? 'hffffff : {8'(x_cnt+y_cnt),(7'(x_cnt+y_cnt))<<1,~(8'(x_cnt+y_cnt))};
+assign wshb_ifm.dat_ms = 'hff;
 
 endmodule
