@@ -147,7 +147,7 @@ begin
 	video_began <= 1'b0;
 end
 else
-	if((x_cnt == 0) && (y_cnt == 0))
+	if(!video_ifm.VS)
 	begin
 		// On attends que la fifo soit full
 		pre_first_full <= fifo_wfull;

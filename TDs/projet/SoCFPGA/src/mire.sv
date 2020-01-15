@@ -18,11 +18,9 @@ begin
   breaker <= 0;
 end
 else
-	if(token)
-	begin
-	  breaker <= breaker+1;
-		wshb_ifm.stb <= (breaker != 0) && token;
-		if(wshb_ifm.ack)
+begin
+	breaker <= breaker+1;
+	if(wshb_ifm.ack)
 		begin
 			// Mise à jour des compteurs
 			x_cnt <= x_cnt+1;
@@ -32,19 +30,9 @@ else
 				y_cnt <= (y_cnt == VDISP-1) ? 0 : y_cnt+1;
 			end
 		end
-	end
+end
 
-	always_ff @ (posedge wshb_ifm.clk)
-	if(wshb_ifm.rst)
-	begin
-		wshb_ifm.stb <= 0;
-	end
-	else
-		if(token)
-		begin
-			wshb_ifm.stb <= (breaker != 0) && token;
-		end
-
+assign wshb_ifm.stb = (breaker != 0) && token;
 assign wshb_ifm.adr = (x_cnt + y_cnt*HDISP)*4;
 assign wshb_ifm.we = (x_cnt < (HDISP>>1)) && (y_cnt < (VDISP>>1));
 assign wshb_ifm.cyc = wshb_ifm.stb;
