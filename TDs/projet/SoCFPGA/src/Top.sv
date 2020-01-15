@@ -141,7 +141,9 @@ end
 
 /** INSTANCIATIONS **/
 
+logic token;
 vga #( .HDISP(HDISP), .VDISP(VDISP)) vga_controller (
+	.token(token),
 	.pixel_clk(pixel_clk),
 	.pixel_rst(pixel_rst),
 	.video_ifm(video_ifm),
@@ -149,10 +151,12 @@ vga #( .HDISP(HDISP), .VDISP(VDISP)) vga_controller (
 );
 
 mire #( .HDISP(HDISP), .VDISP(VDISP)) mire (
+	.token(!token),
 	.wshb_ifm(wshb_if_mire)
 );
 
 wshb_intercon #( .HDISP(HDISP), .VDISP(VDISP)) wshb_intercon (
+	.token(token),
 	.wshb_ifs_vga(wshb_if_vga.slave),
 	.wshb_ifs_mire(wshb_if_mire.slave),
 	.wshb_ifm_sdram(wshb_if_sdram.master)

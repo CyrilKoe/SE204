@@ -1,4 +1,5 @@
 module vga #(parameter HDISP = 800, parameter VDISP = 480) (
+	input wire token,
 	input wire pixel_clk,
 	input wire pixel_rst,
 	video_if.master video_ifm,
@@ -10,7 +11,7 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 logic fifo_read, fifo_write, fifo_rempty,fifo_walmost_full, fifo_wfull;
 logic [31:0] fifo_rdata, fifo_wdata;
 
-async_fifo #( .DATA_WIDTH(32), .DEPTH_WIDTH(8) ) sdram_video_fifo (
+async_fifo #( .DATA_WIDTH(32), .DEPTH_WIDTH(8), .ALMOST_FULL_THRESHOLD(255) ) sdram_video_fifo (
 			.rst(wshb_ifm.rst),
 			.rclk(video_ifm.CLK),
 			.read(fifo_read),
@@ -114,12 +115,14 @@ begin
 	end
 end
 
+
+
 // Génération des signaux
+assign wshb_ifm.stb = !fifo_walmost_full && !wshb_ifm.rst && token;
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 1'b0;
 assign wshb_ifm.cyc = wshb_ifm.stb;
 assign wshb_ifm.sel = 4'b1111;
-assign wshb_ifm.stb = !fifo_walmost_full & !wshb_ifm.rst;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
 assign wshb_ifm.dat_ms = '0;
