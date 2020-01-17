@@ -1,5 +1,4 @@
 module wshb_intercon #(parameter HDISP = 800, parameter VDISP = 480) (
-	output logic token,
 	wshb_if.slave  wshb_ifs_vga,
   wshb_if.slave  wshb_ifs_mire,
   wshb_if.master  wshb_ifm_sdram
@@ -7,6 +6,8 @@ module wshb_intercon #(parameter HDISP = 800, parameter VDISP = 480) (
 
 // Gestion du token
 // 0 = mire, 1 = vga
+
+logic token ;
 
 always_ff @ (posedge wshb_ifm_sdram.clk)
 if(wshb_ifm_sdram.rst)
