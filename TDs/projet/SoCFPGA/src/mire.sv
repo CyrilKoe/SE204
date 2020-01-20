@@ -44,6 +44,6 @@ assign wshb_ifm.cyc = wshb_ifm.stb;
 assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
-assign wshb_ifm.dat_ms = (x_cnt[4:0] == 0) || (y_cnt[4:0] == 0) ? '1 : '0;
+assign wshb_ifm.dat_ms = (x_cnt[4:0] == 0) || (y_cnt[4:0] == 0) ? '1 : {x_cnt[4:1],y_cnt[4:1],x_cnt[XCNT_WIDTH-1 :- 3]+y_cnt[YCNT_WIDTH-1 :- 3]};
 
 endmodule
