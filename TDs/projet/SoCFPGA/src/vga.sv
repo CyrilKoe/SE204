@@ -114,13 +114,22 @@ begin
 	end
 end
 
+// Passage synchrone du cyc
+always_ff @(posedge wshb_ifm.clk)
+if(wshb_ifm.rst)
+	wshb_ifm.cyc <= '0;
+else
+begin
+	if (wshb_ifm.cyc) wshb_ifm.cyc <= !fifo_wfull;
+	else wshb_ifm.cyc <= !fifo_walmost_full;
+end
 
+// Nécéssité de rester combinatoire (sinon décalage)
+assign wshb_ifm.stb = !fifo_wfull;
 
 // Génération des signaux
-assign wshb_ifm.stb = !fifo_wfull;
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 1'b0;
-assign wshb_ifm.cyc = wshb_ifm.stb;
 assign wshb_ifm.sel = 4'b1111;
 assign wshb_ifm.cti = '0;
 assign wshb_ifm.bte = '0;
