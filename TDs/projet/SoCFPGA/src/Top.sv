@@ -74,22 +74,24 @@ assign wshb_if_sdram.bte = '0 ;
 //------- Code Eleves ------
 //--------------------------
 
-// Partie de base
+////////// INPUTS //////////
 
+assign sys_rst = !KEY[0];
+assign LED[0] = sys_rst;
+
+////////// PREMIER COMPTEUR //////////
+
+// Définition premier compteur
 `ifdef SIMULATION
   localparam MAX_CNT_1=50 ;
 `else
+
   localparam MAX_CNT_1=50000000 ;
 `endif
-
 parameter CNT_WIDTH_1 = $clog2(MAX_CNT_1);
-
 logic[CNT_WIDTH_1-1:0] cnt_1;
 
-assign sys_rst = KEY[0];
-assign LED[0] = KEY[0];
-
-
+// Comportement synchrone du premier compteur
 always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
@@ -103,11 +105,11 @@ always_ff @ (posedge sys_clk) begin
 	end
 end
 
-// Gestion du pxl_rst
+////////// GESTION PXL_RST //////////
 
-logic pixel_rst;
-logic pixel_rst_buffer;
+logic pixel_rst, pixel_rst_buffer;
 
+// Adaptation domaine d'horloge
 always_ff@(posedge pixel_clk or posedge sys_rst)
 if(sys_rst)
 begin
@@ -120,7 +122,7 @@ begin
 	pixel_rst <= pixel_rst_buffer;
 end
 
-// Nouveau compteur
+////////// SECOND COMPTEUR //////////
 
 `ifdef SIMULATION
   localparam MAX_CNT_2=16 ;
@@ -129,11 +131,9 @@ end
 `endif
 
 parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
-
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
-assign sys_rst = !KEY[0];
-
+// Meme logique mais basée sur pixel_clk et rst
 always_ff @ (posedge pixel_clk) begin
 	if(pixel_rst)
 	begin

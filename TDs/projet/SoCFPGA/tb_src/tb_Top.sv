@@ -20,18 +20,21 @@ Top Top0(.*) ;
 //  Code élèves
 //////////////////////////////
 
-always #10ns FPGA_CLK1_50 = ~FPGA_CLK1_50; // On genere une horloge
+// Génération horloge
+always #10ns FPGA_CLK1_50 = ~FPGA_CLK1_50;
 
+// Inputs
 initial begin: ENTREES
-  KEY[0] = 1;
-  #128ns
   KEY[0] = 0;
   #128ns
   KEY[0] = 1;
+  #3000ns
+  KEY[0] = 0;
 end
 
+// Durée de simu
 initial begin: TIMER
-  #300ns
+  #3256ns
   $stop();
 end
 
