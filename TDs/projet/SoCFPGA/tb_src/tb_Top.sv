@@ -28,23 +28,25 @@ Top #( .HDISP(160), .VDISP(90)) Top0(
 
  screen #(.mode(13),.X(160),.Y(90)) screen0(.video_ifs(video_if0));
 
-///////////////////////////////
+////////////////////////////////
 //  Code élèves
 //////////////////////////////
 
-always #10ns FPGA_CLK1_50 = ~FPGA_CLK1_50; // On genere une horloge
+// Horloge
+always #10ns FPGA_CLK1_50 = ~FPGA_CLK1_50;
 
+// Reset
 initial begin: ENTREES
-  $dumpfile("../signals.vcd");
-  $dumpvars(0,Top0.video_ifm, Top0.wshb_if_sdram, Top0.hw_support_inst);
   KEY[0] = 0;
   #128ns
   KEY[0] = 1;
 end
 
+// Temps de simu
 initial begin: TIMER
-  #100s;
+  #10ms;
   $stop();
 end
+
 
 endmodule
