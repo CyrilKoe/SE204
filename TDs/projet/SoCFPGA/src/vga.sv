@@ -5,7 +5,7 @@ module vga #(parameter HDISP = 800, parameter VDISP = 480) (
 	wshb_if.master  wshb_ifm
 );
 
-//* INSTANCIATION FIFO *//
+////////// INSTANCIATION FIFO //////////
 
 logic fifo_read, fifo_write, fifo_rempty,fifo_walmost_full, fifo_wfull;
 logic [31:0] fifo_rdata, fifo_wdata;
@@ -24,7 +24,7 @@ async_fifo #( .DATA_WIDTH(32), .DEPTH_WIDTH(8), .ALMOST_FULL_THRESHOLD(255) ) sd
 );
 
 
-/** GENERATION DES SIGNAUX **/
+////////// GENERATION DES SIGNAUX //////////
 
 localparam HFP=40;
 localparam HPULSE=48;
@@ -34,15 +34,15 @@ localparam VPULSE=3;
 localparam VBP = 29;
 localparam HCNT_SIZE = HFP+HPULSE+HBP+HDISP;
 localparam VCNT_SIZE = VFP+VPULSE+VBP+VDISP;
+
+////////// GESTION DES COMPTEURS VGA //////////
+
 localparam HCNT_WIDTH = $clog2(HCNT_SIZE);
 localparam VCNT_WIDTH = $clog2(VCNT_SIZE);
 
 logic[HCNT_WIDTH-1:0] h_cnt;
 logic[VCNT_WIDTH-1:0] v_cnt;
 
-assign video_ifm.CLK = pixel_clk;
-
-// Gestion des compteurs
 always_ff @ (posedge pixel_clk)
 if(pixel_rst)
 begin
@@ -60,39 +60,23 @@ begin
 
 end
 
-// Génération des signaux videos
+////////// GENERATION DES SIGNAUX DE CONTROLE VGA //////////
+
+assign video_ifm.CLK = pixel_clk;
 assign video_ifm.HS = !(h_cnt >= HFP && h_cnt < HFP+HPULSE);
 assign video_ifm.VS = !(v_cnt >= VFP && v_cnt < VFP+VPULSE);
 assign video_ifm.BLANK = (h_cnt >= HFP+HPULSE+HBP) && (v_cnt >= VFP+VPULSE+VBP);
 
 
-/** TRADUCTION DES COMPTEURS **/
+//** LECTURE EN SDRAM ET ECRITURE EN FIFO **//
 
 localparam XCNT_WIDTH = $clog2(HDISP);
 localparam YCNT_WIDTH = $clog2(VDISP);
-logic[XCNT_WIDTH-1:0] x_cnt;
-logic[YCNT_WIDTH-1:0] y_cnt;
-
-// Gestion des nouveaux compteurs
-always_comb
-begin
-	if(!video_ifm.BLANK || pixel_rst)
-	begin
-		x_cnt = 0;
-		y_cnt = 0;
-	end
-	else
-	begin
-		x_cnt = h_cnt-(HFP+HPULSE+HBP);
-		y_cnt = v_cnt-(VFP+VPULSE+VBP);
-	end
-end
-
-
-//** LECTURE EN SDRAM ET ECRITURE EN FIFO **//
 
 logic[XCNT_WIDTH-1:0] x_cnt_sdram;
 logic[YCNT_WIDTH-1:0] y_cnt_sdram;
+
+// Compteurs de lecture
 always_ff @ (posedge wshb_ifm.clk)
 if(wshb_ifm.rst)
 begin
@@ -124,10 +108,9 @@ begin
 	else wshb_ifm.cyc <= !fifo_walmost_full;
 end
 
-// Nécéssité de rester combinatoire (sinon décalage)
-assign wshb_ifm.stb = !fifo_wfull;
 
-// Génération des signaux
+// Génération des signaux de lecture
+assign wshb_ifm.stb = !fifo_wfull;
 assign wshb_ifm.adr = (x_cnt_sdram + y_cnt_sdram*HDISP)*4;
 assign wshb_ifm.we = 1'b0;
 assign wshb_ifm.sel = 4'b1111;
@@ -141,7 +124,7 @@ assign fifo_wdata = wshb_ifm.dat_sm;
 
 
 
-/** LECTURE EN FIFO **/
+////////// LECTURE EN FIFO //////////s
 
 
 // Adaptation du signal first full dans le bon système d'horloge
@@ -164,6 +147,10 @@ else
 	end
 
 assign fifo_read = video_ifm.BLANK & video_began;
+
+////////// ENVOI PIXEL //////////
+
 assign video_ifm.RGB = fifo_rdata;
+
 
 endmodule

@@ -40,7 +40,6 @@ wshb_if #( .DATA_BYTES(4)) wshb_if_vga  (sys_clk, sys_rst);
 //=============================
 //  Le support matériel
 //=============================
-`ifndef SIMULATIONHOME
 hw_support hw_support_inst (
     .wshb_ifs (wshb_if_sdram),
     .wshb_ifm (wshb_if_stream),
@@ -49,33 +48,34 @@ hw_support hw_support_inst (
     .SW_0     ( SW[0] ),
     .KEY      ( KEY )
  );
-`endif
 
 
 //--------------------------
 //------- Code Eleves ------
 //--------------------------
 
-/** SQUELETTE DU PROJET **/
-
-`ifdef SIMULATION
-  localparam MAX_CNT_1=50 ;
-`else
-  localparam MAX_CNT_1=50000000 ;
-`endif
-
-localparam CNT_WIDTH_1 = $clog2(MAX_CNT_1);
-
-logic[CNT_WIDTH_1-1:0] cnt_1;
+////////// INPUTS //////////
 
 assign sys_rst = !KEY[0];
 assign LED[0] = sys_rst;
 
+////////// PREMIER COMPTEUR //////////
 
+// Définition premier compteur
+`ifdef SIMULATION
+  localparam MAX_CNT_1=50 ;
+`else
+
+  localparam MAX_CNT_1=50000000 ;
+`endif
+parameter CNT_WIDTH_1 = $clog2(MAX_CNT_1);
+logic[CNT_WIDTH_1-1:0] cnt_1;
+
+// Comportement synchrone du premier compteur
 always_ff @ (posedge sys_clk) begin
 	if(sys_rst)
 	begin
-		cnt_1 <= 0;
+		cnt_1 = 0;
 		LED[1] <= 0;
 	end
 	else
@@ -85,11 +85,11 @@ always_ff @ (posedge sys_clk) begin
 	end
 end
 
-// Gestion du pxl_rst
+////////// GESTION PXL_RST //////////
 
-logic pixel_rst;
-logic pixel_rst_buffer;
+logic pixel_rst, pixel_rst_buffer;
 
+// Adaptation domaine d'horloge
 always_ff@(posedge pixel_clk or posedge sys_rst)
 if(sys_rst)
 begin
@@ -102,7 +102,7 @@ begin
 	pixel_rst <= pixel_rst_buffer;
 end
 
-// Nouveau compteur
+////////// SECOND COMPTEUR //////////
 
 `ifdef SIMULATION
   localparam MAX_CNT_2=16 ;
@@ -110,15 +110,14 @@ end
   localparam MAX_CNT_2=16000000 ;
 `endif
 
-localparam CNT_WIDTH_2 = $clog2(MAX_CNT_2);
-
+parameter CNT_WIDTH_2 = $clog2(MAX_CNT_2);
 logic[CNT_WIDTH_2-1:0] cnt_2;
 
-
+// Meme logique mais basée sur pixel_clk et rst
 always_ff @ (posedge pixel_clk) begin
 	if(pixel_rst)
 	begin
-		cnt_2 <= 0;
+		cnt_2 = 0;
 		LED[2] <= 0;
 	end
 	else
@@ -128,7 +127,8 @@ always_ff @ (posedge pixel_clk) begin
 	end
 end
 
-/** INSTANCIATIONS **/
+
+////////// INSTANCIATIONS //////////
 
 vga #( .HDISP(HDISP), .VDISP(VDISP)) vga_controller (
 	.pixel_clk(pixel_clk),
